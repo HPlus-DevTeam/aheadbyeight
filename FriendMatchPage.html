@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahead by Eight - フレンド対戦</title>
+    <link rel="stylesheet" href="styles/game.css">
+    <link rel="stylesheet" href="styles/friend-match.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>フレンド対戦</h1>
+            <button id="quit-button" class="quit-button" title="トップに戻る">×</button>
+        </header>
+
+        <div class="friend-match-container">
+            <div class="match-options">
+                <div class="match-type">
+                    <h2>対戦方法を選択</h2>
+                    <div class="options-container">
+                        <div class="option-card">
+                            <h3>ルームを作成</h3>
+                            <p>自分がホストになり、友達を招待</p>
+                            <button id="create-room" class="game-button battle-button">ルーム作成</button>
+                        </div>
+                        <div class="option-card">
+                            <h3>ルームに参加</h3>
+                            <p>友達が作成したルームに参加</p>
+                            <button id="join-room" class="game-button battle-button">参加する</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-creation-panel" id="room-creation-panel" style="display: none;">
+                    <h2>ルーム作成</h2>
+                    <div class="room-code-display">
+                        <p>ルームコード:</p>
+                        <div id="room-code" class="room-code">XXXX</div>
+                        <p>このコードを友達に共有して招待しましょう</p>
+                    </div>
+                    <div class="waiting-status">
+                        <p>対戦相手の参加を待っています...</p>
+                        <div class="spinner"></div>
+                    </div>
+                    <button id="cancel-room" class="game-button">キャンセル</button>
+                </div>
+
+                <div class="room-joining-panel" id="room-joining-panel" style="display: none;">
+                    <h2>ルームに参加</h2>
+                    <div class="code-entry">
+                        <p>友達から受け取ったルームコードを入力:</p>
+                        <input type="text" id="enter-room-code" placeholder="ルームコード (例: ABCD)" maxlength="4">
+                        <button id="submit-code" class="game-button battle-button">参加</button>
+                    </div>
+                    <div id="code-error" class="error-message" style="display: none;">
+                        有効なルームコードを入力してください
+                    </div>
+                    <button id="cancel-join" class="game-button">キャンセル</button>
+                </div>
+            </div>
+
+            <div class="friend-list">
+                <h2>最近の対戦相手</h2>
+                <div class="friend-list-container" id="recent-opponents">
+                    <div class="friend-item">
+                        <span class="friend-name">プレイヤー1</span>
+                        <button class="game-button small-button">招待</button>
+                    </div>
+                    <div class="friend-item">
+                        <span class="friend-name">プレイヤー2</span>
+                        <button class="game-button small-button">招待</button>
+                    </div>
+                    <div class="no-friends-message">
+                        <p>まだ対戦履歴がありません</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-message" id="game-message">
+            <!-- ゲームメッセージ表示エリア -->
+        </div>
+
+        <div class="game-overlay" id="game-overlay">
+            <div class="overlay-content" id="overlay-content">
+                <!-- オーバーレイコンテンツ -->
+            </div>
+        </div>
+    </div>
+
+    <!-- スクリプト -->
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/friend-match.js"></script>
+    <script>
+        // ページ読み込み時に実行
+        document.addEventListener('DOMContentLoaded', () => {
+            // 「×」ボタンのイベントリスナー
+            const quitButton = document.getElementById('quit-button');
+            if (quitButton) {
+                quitButton.addEventListener('click', () => {
+                    if (confirm('トップページに戻りますか？')) {
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+
+            // ルーム作成ボタン
+            const createRoomBtn = document.getElementById('create-room');
+            const roomCreationPanel = document.getElementById('room-creation-panel');
+            const matchOptions = document.querySelector('.match-options');
+            const roomCode = document.getElementById('room-code');
+            const cancelRoomBtn = document.getElementById('cancel-room');
+
+            if (createRoomBtn) {
+                createRoomBtn.addEventListener('click', () => {
+                    // ルームコードをランダムに生成
+                    const code = generateRoomCode();
+                    roomCode.textContent = code;
+                    
+                    // パネルを表示
+                    roomCreationPanel.style.display = 'block';
+                    document.querySelector('.match-type').style.display = 'none';
+                    
+                    // サーバーとの通信を模倣
+                    setTimeout(() => {
+                        showMessage('対戦相手が見つかりました！ゲームを開始します...', 'info');
+                        setTimeout(() => {
+                            window.location.href = 'GamePage.html?mode=friend&room=' + code;
+                        }, 2000);
+                    }, 5000);
+                });
+            }
+
+            if (cancelRoomBtn) {
+                cancelRoomBtn.addEventListener('click', () => {
+                    roomCreationPanel.style.display = 'none';
+                    document.querySelector('.match-type').style.display = 'block';
+                });
+            }
+
+            // ルーム参加ボタン
+            const joinRoomBtn = document.getElementById('join-room');
+            const roomJoiningPanel = document.getElementById('room-joining-panel');
+            const submitCodeBtn = document.getElementById('submit-code');
+            const cancelJoinBtn = document.getElementById('cancel-join');
+            const roomCodeInput = document.getElementById('enter-room-code');
+            const codeError = document.getElementById('code-error');
+
+            if (joinRoomBtn) {
+                joinRoomBtn.addEventListener('click', () => {
+                    roomJoiningPanel.style.display = 'block';
+                    document.querySelector('.match-type').style.display = 'none';
+                });
+            }
+
+            if (submitCodeBtn) {
+                submitCodeBtn.addEventListener('click', () => {
+                    const code = roomCodeInput.value.toUpperCase();
+                    if (code.length === 4 && /^[A-Z0-9]{4}$/.test(code)) {
+                        showMessage('ルームに接続中...', 'info');
+                        setTimeout(() => {
+                            window.location.href = 'GamePage.html?mode=friend&room=' + code;
+                        }, 2000);
+                    } else {
+                        codeError.style.display = 'block';
+                    }
+                });
+            }
+
+            if (cancelJoinBtn) {
+                cancelJoinBtn.addEventListener('click', () => {
+                    roomJoiningPanel.style.display = 'none';
+                    document.querySelector('.match-type').style.display = 'block';
+                    codeError.style.display = 'none';
+                });
+            }
+
+            // メッセージ表示関数
+            function showMessage(message, type = 'default') {
+                const messageEl = document.getElementById('game-message');
+                if (!messageEl) return;
+                
+                // メッセージをセット
+                messageEl.textContent = message;
+                messageEl.className = `game-message ${type} show`;
+                
+                // 自動的に消える
+                setTimeout(() => {
+                    messageEl.classList.remove('show');
+                }, 3000);
+            }
+
+            // ランダムなルームコードを生成
+            function generateRoomCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 4; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return code;
+            }
+        });
+    </script>
+</body>
+</html>

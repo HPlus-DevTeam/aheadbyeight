@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランキング戦 - Ahead by Eight</title>
+    <link rel="stylesheet" href="styles/game.css">
+    <style>
+        .ranking-container {
+            width: 1100px;
+            height: 800px;
+            background: url('images/background/playmat.png') center/contain no-repeat;
+            background-color: #1a5f3f;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform-origin: center center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .ranking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: rgba(44, 62, 80, 0.95);
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .player-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .ranking-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .ranking-section {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ranking-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .ranking-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+
+        .ranking-item:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #95a5a6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .rank.top-1 { background-color: #f1c40f; }
+        .rank.top-2 { background-color: #bdc3c7; }
+        .rank.top-3 { background-color: #d35400; }
+
+        .player-name {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .points {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .match-history {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .history-result {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .history-result.win {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .history-result.lose {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-button.primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .action-button.secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: rgba(52, 152, 219, 0.9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background-color: rgba(41, 128, 185, 0.95);
+            transform: translateY(-2px);
+        }
+
+        #waiting-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .waiting-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .waiting-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1150px) {
+            .ranking-container {
+                transform: scale(0.9);
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .ranking-container {
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="location.href='index.html'">← トップに戻る</button>
+
+    <div class="ranking-container">
+        <div class="ranking-header">
+            <div class="player-info">
+                <div class="player-avatar">P</div>
+                <div class="player-stats">
+                    <div id="player-name">未登録</div>
+                    <div id="player-rank">ランク: -</div>
+                    <div id="player-points">ポイント: 0</div>
+                </div>
+            </div>
+            <div class="account-status" id="account-status">
+                <!-- アカウント状態に応じて表示が変わります -->
+            </div>
+        </div>
+
+        <div class="ranking-content">
+            <div class="ranking-section">
+                <h2 class="ranking-title">グローバルランキング</h2>
+                <div class="ranking-list" id="global-ranking">
+                    <!-- ランキングリストがここに表示されます -->
+                </div>
+            </div>
+
+            <div class="ranking-section">
+                <h2 class="ranking-title">対戦履歴</h2>
+                <div class="ranking-list" id="match-history">
+                    <!-- 対戦履歴がここに表示されます -->
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="start-ranking-match" class="action-button primary">ランキング戦を開始</button>
+            <button id="view-leaderboard" class="action-button secondary">リーダーボードを表示</button>
+        </div>
+    </div>
+
+    <div id="waiting-overlay">
+        <div class="waiting-content">
+            <div class="waiting-spinner"></div>
+            <h3>対戦相手を探しています...</h3>
+            <p id="waiting-time">待機時間: 0:00</p>
+            <button id="cancel-matchmaking" class="action-button secondary">キャンセル</button>
+        </div>
+    </div>
+
+    <script src="scripts/account.js"></script>
+    <script src="scripts/ranking.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const accountManager = new AccountManager();
+            
+            // アカウント状態の確認と表示の更新
+            function updateAccountStatus() {
+                const statusDiv = document.getElementById('account-status');
+                const startButton = document.getElementById('start-ranking-match');
+                
+                if (accountManager.isLoggedIn()) {
+                    const account = accountManager.getAccountInfo();
+                    document.getElementById('player-name').textContent = account.email;
+                    statusDiv.innerHTML = `
+                        <div style="color: #2ecc71;">✓ アカウント登録済み</div>
+                        <div style="font-size: 0.8em;">ID: ${account.accountNumber}</div>
+                    `;
+                    startButton.disabled = false;
+                } else {
+                    statusDiv.innerHTML = `
+                        <button onclick="showRegistrationForm()" class="action-button primary">
+                            アカウント登録
+                        </button>
+                    `;
+                    startButton.disabled = true;
+                }
+            }
+            
+            // 初期表示の更新
+            updateAccountStatus();
+            
+            // ランキング戦開始ボタンのイベント設定
+            document.getElementById('start-ranking-match').addEventListener('click', () => {
+                if (!accountManager.isLoggedIn()) {
+                    showRegistrationForm();
+                    return;
+                }
+                
+                // ランキング戦の開始処理
+                rankingSystem.startMatchmaking((opponent) => {
+                    // マッチが見つかった時の処理
+                    location.href = `GamePage.html?mode=ranking&opponent=${opponent.name}`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

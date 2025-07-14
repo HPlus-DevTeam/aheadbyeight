@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahead by Eight - プロフィール設定</title>
+    <link rel="stylesheet" href="styles/game.css">
+    <link rel="stylesheet" href="styles/profile.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>プロフィール設定</h1>
+            <button id="quit-button" class="quit-button" title="トップに戻る">×</button>
+        </header>
+
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar-container">
+                        <div class="profile-avatar" id="profile-avatar">
+                            <!-- Default avatar or first letter of name -->
+                            <span id="avatar-initial">P</span>
+                        </div>
+                        <div class="country-flag" id="country-flag">
+                            <!-- Country flag will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <h2>プレイヤー情報</h2>
+                        <p>お好きな名前を設定して、世界中のプレイヤーと対戦しましょう！</p>
+                    </div>
+                </div>
+                
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label for="player-name">プレイヤー名</label>
+                        <input type="text" id="player-name" maxlength="15" placeholder="プレイヤー名を入力 (最大15文字)">
+                    </div>
+                    
+                    <div class="form-group country-info">
+                        <label>国籍</label>
+                        <div class="country-display">
+                            <div class="country-flag-mini" id="country-flag-mini"></div>
+                            <span id="country-name">検出中...</span>
+                            <span class="auto-detect">(自動検出)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ゲーム統計</label>
+                        <div class="stats-display">
+                            <div class="stat-item">
+                                <span class="stat-value" id="games-played">0</span>
+                                <span class="stat-label">総対戦数</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="wins">0</span>
+                                <span class="stat-label">勝利</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="win-rate">0%</span>
+                                <span class="stat-label">勝率</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button id="save-profile" class="game-button battle-button">保存</button>
+                    <button id="reset-stats" class="game-button">統計リセット</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-message" id="game-message">
+            <!-- ゲームメッセージ表示エリア -->
+        </div>
+    </div>
+
+    <!-- スクリプト -->
+    <script src="scripts/profile.js"></script>
+</body>
+</html>
